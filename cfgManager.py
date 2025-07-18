@@ -16,7 +16,7 @@ def AddCfg(typeCfg, cfg, dir):
     project_dir = os.path.dirname(os.path.abspath(__file__))
     cfg_path = os.path.join(project_dir, 'cfg.json')
     data = {}
-    print(cfg_path)
+
     if not os.path.exists(cfg_path):
         return "Error: config file does not exist."
 
@@ -39,9 +39,38 @@ def AddCfg(typeCfg, cfg, dir):
 
     return "Config added successfully."
 
-def main():
-    print(AddCfg("type", "jsoFn", "fvfvfvfvfv"))
+def DelCfg(typeCfg, cfg):
+    """
+    This function deletes a config.
+    Input:
+        - typeCfg: The type of the config (must match a key in the JSON file).
+        - cfg: The name of the configuration to delete.
+    Output:
+        - A status message (string).
+    """
+    project_dir = os.path.dirname(os.path.abspath(__file__))
+    cfg_path = os.path.join(project_dir, 'cfg.json')
+    data = {}
 
+    if not os.path.exists(cfg_path):
+        return "Error: config file does not exist."
 
-if __name__ == "__main__":
-    main()
+    try:
+        with open(cfg_path, 'r') as file:
+            data = json.load(file)
+    except json.JSONDecodeError:
+        return "Error: config file is not a valid JSON."
+
+    if typeCfg not in data:
+        return f"Error: config type '{typeCfg}' not found in JSON."
+    types = data[typeCfg]
+    if cfg not in types:
+        return "This config desn't exists."
+
+    data[typeCfg].remove(cfg)
+    data["directories"].pop(cfg)
+    with open(cfg_path, 'w') as file:
+        json.dump(data, file, indent=4)
+
+    return "Config deleted successfully."
+
