@@ -31,12 +31,11 @@ def SortSingleFile(path):
     cfg_path = os.path.join(project_dir, 'cfg.json')
 
     try:
-        with open(cfg_path, 'r') as cfg_file:
+        with open(cfg_path, 'r', encoding="utf-8") as cfg_file:
             data = json.load(cfg_file)
 
         directories = data["directories"]
         types = data["type"]
-        print(types)
         extension = nameParts[TYPE]
         if extension in types:
             baseNewPath = directories[extension]
@@ -64,3 +63,25 @@ def SortSingleFile(path):
     except Exception as e:
         return f"Error: {e}"
     
+def SortDir(dir):
+    """
+    This function sort a files to new directory.
+    Input:
+        - dir: path to the directory whose files should be sorted.
+    Output:
+        - A status files(list success - 0, faild - 1).
+    """
+    SUCCESS = 0
+    FAILD = 1
+    results = [[],[]]
+    with os.scandir(dir) as dirfiles:
+        for file in dirfiles:
+            if file.is_file():
+                fileName = file.name
+                path =  os.path.join(dir,fileName)
+                result = SortSingleFile(path)
+                if "Successfully" in result:
+                    results[SUCCESS].append(fileName)
+                else:
+                    results[FAILD].append(fileName)
+    return results
