@@ -73,6 +73,55 @@ def add_condition():
     confirm_button = ctk.CTkButton(window, text="Confirm", command=confirm)
     confirm_button.pack(pady=15)
 
+def settings():
+    window = ctk.CTkToplevel()
+    window.geometry("400x300")
+    window.title("Settings")
+
+    selected_path = ctk.StringVar()
+    selected_option_first = ctk.StringVar()
+    selected_option_second = ctk.StringVar()
+    selected_option_third = ctk.StringVar()
+    param_value = ctk.StringVar()
+
+    options = ["date", "size", "type"]
+
+    first = ctk.CTkOptionMenu(window, values=options, variable=selected_option_first)
+    first.set("Choose the first condition")
+    first.pack(pady=10, padx=20)
+
+    def update_second_options(*args):
+        new_options = [opt for opt in options if opt != selected_option_first.get()]
+        second.configure(values=new_options)
+        if selected_option_second.get() not in new_options:
+            selected_option_second.set("")
+
+    def update_third_options(*args):
+        new_options = [opt for opt in options if opt != selected_option_first.get() and opt != selected_option_second.get()]
+        third.configure(values=new_options)
+        if selected_option_third.get() not in new_options:
+            selected_option_third.set("")
+
+    second = ctk.CTkOptionMenu(window, values=[opt for opt in options if opt != selected_option_first.get()], variable=selected_option_second)
+    second.set("Choose the second condition")
+    second.pack(pady=15, padx=20)
+
+    third = ctk.CTkOptionMenu(window, values=[opt for opt in options if opt != selected_option_first.get() and opt != selected_option_second.get()], variable=selected_option_third)
+    third.set("Choose the third condition")
+    third.pack(pady=15, padx=20)
+
+    selected_option_first.trace_add('write', update_second_options)
+    selected_option_second.trace_add('write', update_third_options)
+
+    def confirm():
+        if not selected_option_first.get() or not selected_option_second.get() or not selected_option_third.get():
+            messagebox.showwarning("Missing Info", "Please select all three conditions.")
+            return
+        messagebox.showinfo("Success", "Successfully customized.")
+        window.destroy()
+
+    confirm_button = ctk.CTkButton(window, text="Confirm", command=confirm)
+    confirm_button.pack(pady=15)
 
 # ------- design -------
 
@@ -85,7 +134,7 @@ opendirectory.pack(pady=20)
 add = ctk.CTkButton(app, text="Add Condition", command=add_condition)
 add.pack(pady=25)
 
-settings = ctk.CTkButton(app, text="settings")
+settings = ctk.CTkButton(app, text="settings", command=settings)
 settings.pack(pady=23)
 
 app.mainloop()
